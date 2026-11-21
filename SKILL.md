@@ -15,13 +15,14 @@ Determine the input type and act accordingly:
 ### 1. If the input is a `.vtt` file
 - Use it directly. Skip to the **Analysis** step.
 
-### 2. If the input is an audio file (e.g., `.m4a`, `.mp3`, `.wav`, `.ogg`, `.flac`, `.aac`, `.wma`) or a URL (starts with `http://` or `https://`)
+### 2. If the input is an audio or video file (e.g., `.m4a`, `.mp3`, `.wav`, `.ogg`, `.flac`, `.aac`, `.wma`, `.mp4`) or a URL (starts with `http://` or `https://`)
 - Run the transcription script via Bash:
   ```
-  ~/github.com/jftuga/transcript-critic/transcribe.sh "<audio-file-or-url>"
+  ~/.claude/skills/transcribe/transcribe.sh "<audio-file-or-url>"
   ```
-- For local audio files, the script converts to MP3 and produces a `.vtt` file with the same base name.
-- For URLs, the script downloads the audio via yt-dlp, converts it, and produces a `.vtt` file. Find the most recently created `.vtt` file in the current directory.
+- The script handles local files (converted to MP3 via ffmpeg) and URLs, including direct links to `.mp3` files (downloaded via yt-dlp).
+- On success, the script prints **only the absolute path of the generated `.vtt` file** on stdout (all progress output goes to stderr). Use exactly that path; do not search the directory for the newest `.vtt` file.
+- If the script exits with an error, show the error to the user and stop.
 - Proceed to the **Analysis** step.
 
 ## Analysis
@@ -32,7 +33,7 @@ Once you have the `.vtt` file:
 
 2. **Read the prompt template** from:
    ```
-   ~/github.com/jftuga/transcript-critic/ANALYSIS_PROMPT.md
+   ~/.claude/skills/transcribe/ANALYSIS_PROMPT.md
    ```
 
 3. **Replace `[TITLE]`** in the prompt with the inferred title. **Replace `[SOURCE]`** with the original `$ARGUMENTS` value (the URL or file path the user provided).

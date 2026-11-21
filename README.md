@@ -41,32 +41,38 @@ Run the install script from the root of this repository:
 ```
 
 This will:
-- Copy `SKILL.md` into Claude Code's global skills directory (`~/.claude/skills/transcribe/`).
-- Add a permission rule to `~/.claude/settings.json` so that `/transcribe` can read
-  files from this repository (e.g., `ANALYSIS_PROMPT.md`) without prompting.
+- Copy `SKILL.md`, `ANALYSIS_PROMPT.md` and `transcribe.sh` into Claude Code's global skills
+  directory (`~/.claude/skills/transcribe/`). The skill only references these installed copies,
+  so the repository can be cloned anywhere.
+- Add permission rules to `~/.claude/settings.json` so that `/transcribe` can read
+  `ANALYSIS_PROMPT.md` and run `transcribe.sh` without prompting. A backup of the previous
+  settings is saved to `~/.claude/settings.json.bak`.
+
+Re-run `./install.sh` after pulling updates to refresh the installed files.
 
 > [!Note]
-> If you prefer to install manually, copy `SKILL.md` to `~/.claude/skills/transcribe/SKILL.md`
-> and add the permission rule shown in the [Permissions](#permissions) section to the
+> If you prefer to install manually, copy the three files to `~/.claude/skills/transcribe/`
+> and add the permission rules shown in the [Permissions](#permissions) section to the
 > `permissions.allow` array in `~/.claude/settings.json`.
 
-### 2. Configure script paths
+### 2. Configure whisper.cpp
 
-**In `transcribe.sh`**, update the following variables at the top of
-the script to match your local whisper.cpp installation:
+`transcribe.sh` looks for whisper.cpp in `~/github.com/ggerganov/whisper.cpp` by default.
+If yours is elsewhere, or you want a different model or language, set these environment
+variables (for example in your shell profile):
 
-```bash
-WHISPER_ROOT="${HOME}/github.com/ggerganov/whisper.cpp"
-PGM="${WHISPER_ROOT}/build/bin/whisper-cli"
-MODEL="${WHISPER_ROOT}/models/ggml-medium.en.bin"
-```
-
-- `WHISPER_ROOT` must point to your whisper.cpp checkout.
-- `PGM` must point to the compiled `whisper-cli` binary.
-- `MODEL` must point to the GGML model file you want to use (e.g., `ggml-medium.en.bin`).
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `WHISPER_ROOT` | `~/github.com/ggerganov/whisper.cpp` | Your whisper.cpp checkout |
+| `WHISPER_CLI` | `$WHISPER_ROOT/build/bin/whisper-cli` | The compiled `whisper-cli` binary |
+| `WHISPER_MODEL` | `$WHISPER_ROOT/models/ggml-medium.en.bin` | The GGML model file |
+| `WHISPER_LANGUAGE` | `en` | Spoken language code (e.g. `pt`), or `auto` to detect it |
 
 > [!Note]
-> In `SKILL.md`, the paths to `transcribe.sh` and `ANALYSIS_PROMPT.md` are referenced as instructions for Claude. If you clone this repository to a location other than `~/github.com/jftuga/transcript-critic/`, update those paths in `SKILL.md` accordingly.
+> Models ending in `.en` (such as the default `ggml-medium.en.bin`) only transcribe English.
+> For other languages, download a multilingual model (e.g. `ggml-medium.bin`) and set
+> `WHISPER_MODEL` and `WHISPER_LANGUAGE` accordingly. The script refuses to run an
+> English-only model with a non-English language.
 
 ## Usage
 
@@ -77,6 +83,7 @@ Once installed, use the `/transcribe` slash command inside Claude Code:
 /transcribe interview.mp3
 /transcribe podcast.vtt
 /transcribe https://www.youtube.com/watch?v=VIDEO_ID
+/transcribe https://example.com/episode.mp3
 ```
 
 Claude will:
@@ -94,10 +101,13 @@ The project is composed of the following files:
   to invoke `transcribe.sh`, and how to produce the final analysis. Claude Code reads this
   file when the `/transcribe` command is invoked.
 
-- **`transcribe.sh`** -- Accepts either a local audio/video file or a URL. Local, non-audio files are
-  converted to MP3 via `ffmpeg`; URLs are downloaded and extracted as MP3 via `yt-dlp`. In both
+- **`transcribe.sh`** -- Accepts either a local audio/video file or a URL (including direct links
+  to `.mp3` files). Local, non-MP3 files are converted to MP3 via `ffmpeg`; URLs are downloaded
+  and extracted as MP3 via `yt-dlp`, which reports the exact path of the file it created. In both
   cases, `whisper-cli` is run to produce `.txt` and `.vtt` transcription files. Empty lines are
-  also stripped from the `.vtt` output to reduce token usage during analysis. Because `yt-dlp`
+  also stripped from the `.vtt` output to reduce token usage during analysis. All progress output
+  goes to stderr; on success the script prints only the absolute path of the `.vtt` file on
+  stdout, which is what the skill uses. Because `yt-dlp`
   is used, audio can be downloaded and transcribed from
   [many websites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) -- not just
   YouTube.
@@ -105,11 +115,14 @@ The project is composed of the following files:
 - **`ANALYSIS_PROMPT.md`** -- The prompt template that drives the analysis step. See
   [Transcript summary prompt](#transcript-summary-prompt) for details.
 
-- **`install.sh`** -- Copies `SKILL.md` into Claude Code's global skills directory and
-  calls `add_permission.py` to configure the required permission rule.
+- **`install.sh`** -- Copies `SKILL.md`, `ANALYSIS_PROMPT.md` and `transcribe.sh` into Claude
+  Code's global skills directory and calls `add_permission.py` to configure the required
+  permission rules.
 
-- **`add_permission.py`** -- Adds a permission rule to `~/.claude/settings.json`, creating
-  the file if it does not exist or merging into existing settings.
+- **`add_permission.py`** -- Adds permission rules to `~/.claude/settings.json`, creating
+  the file if it does not exist or merging into existing settings. Existing settings are
+  backed up to `settings.json.bak` before being changed, and the file is left untouched if it
+  is not valid JSON. Note that the file is re-serialised, so custom formatting is not kept.
 
 ## Transcript summary prompt
 
@@ -141,25 +154,27 @@ Because `/transcribe` is a global skill that runs from any directory, its permis
 rules must live in the **global** Claude Code settings file (`~/.claude/settings.json`),
 not in a project-level `.claude/settings.json`.
 
-The `install.sh` script automatically adds the required rule. If you need to add it
+The `install.sh` script automatically adds the required rules. If you need to add them
 manually, ensure your `~/.claude/settings.json` contains:
 
 ```json
 {
   "permissions": {
     "allow": [
-      "Read(~/github.com/jftuga/transcript-critic/**)"
+      "Read(~/.claude/skills/transcribe/**)",
+      "Bash(~/.claude/skills/transcribe/transcribe.sh:*)"
     ]
   }
 }
 ```
 
-This allows Claude to read `ANALYSIS_PROMPT.md` and other files from this repository
-without prompting. Empty-line removal from `.vtt` files is handled directly by
-`transcribe.sh`, so no separate Bash permission is needed.
+The `Read` rule allows Claude to read `ANALYSIS_PROMPT.md`, and the `Bash` rule allows it to
+run `transcribe.sh` without prompting. Empty-line removal from `.vtt` files is handled directly
+by `transcribe.sh`, so no other Bash permission is needed.
 
 > [!Note]
-> If you cloned this repository to a different path, update the `Read(...)` rule accordingly.
+> Earlier versions added `Read(~/github.com/jftuga/transcript-critic/**)`. That rule is no
+> longer needed and can be removed from your settings.
 
 ## Personal Project Disclosure
 
