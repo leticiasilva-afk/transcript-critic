@@ -1,0 +1,4 @@
+# Shell scripts must keep LF line endings, or bash fails on Windows
+# (Git for Windows converts to CRLF by default).
+*.sh text eol=lf
+*.py text eol=lf

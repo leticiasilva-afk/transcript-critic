@@ -30,7 +30,23 @@ echo "Installed SKILL.md, ANALYSIS_PROMPT.md and transcribe.sh to $SKILL_DIR/"
 READ_RULE="Read(~/.claude/skills/transcribe/**)"
 BASH_RULE="Bash(~/.claude/skills/transcribe/transcribe.sh:*)"
 
-python3 "$SCRIPT_DIR/add_permission.py" "$SETTINGS_FILE" "$READ_RULE" "$BASH_RULE"
+# Find a working Python 3. On Windows, "python3" is often only a Microsoft
+# Store placeholder, so also try "python" and the "py" launcher.
+PYTHON=()
+for candidate in "python3" "python" "py -3"; do
+    read -r -a cmd <<< "$candidate"
+    if command -v "${cmd[0]}" >/dev/null 2>&1 \
+        && "${cmd[@]}" -c 'import sys; sys.exit(0 if sys.version_info[0] == 3 else 1)' >/dev/null 2>&1; then
+        PYTHON=("${cmd[@]}")
+        break
+    fi
+done
+if [[ ${#PYTHON[@]} -eq 0 ]]; then
+    echo "Error: Python 3 not found (tried python3, python, py -3)." >&2
+    exit 1
+fi
+
+"${PYTHON[@]}" "$SCRIPT_DIR/add_permission.py" "$SETTINGS_FILE" "$READ_RULE" "$BASH_RULE"
 
 echo ""
 echo "Installation complete. You can now use /transcribe in Claude Code."
