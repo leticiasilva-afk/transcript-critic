@@ -51,4 +51,5 @@ Once you have the `.vtt` file:
 - The analysis must follow the structured format defined in the prompt template exactly.
 - Always cite timestamps in `[HH:MM:SS]` or `[HH:MM:SS--HH:MM:SS]` format as specified.
 - Maintain a neutral, descriptive tone throughout the analysis.
+- Write the entire analysis in European Portuguese (Portugal), as the prompt template specifies, regardless of the language of the transcript. The inferred title may stay in its original language.
 - The `.md` output file should be created in the same directory as the `.vtt` file.

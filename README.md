@@ -129,16 +129,18 @@ The project is composed of the following files:
 The file `ANALYSIS_PROMPT.md` is the prompt template that drives the analysis
 step. It instructs Claude to produce a structured markdown document with the following sections:
 
+The analysis is written in **European Portuguese**, whatever the language of the transcript.
+
 | Section | Description |
 |---------|-------------|
-| **Overview** | A concise thesis summary. |
-| **Source Material** | Link or path to the original source. |
-| **Key Terms and Concepts** | Definitions anchored to first-mention timestamps. |
-| **Detailed Summary** | Section-by-section breakdown with timestamp ranges. |
-| **Scripture References** | Included only when the content is theological. |
-| **Evidentiary Notes** | Categorizes each claim by its type of support (anecdotal, appeal to authority, logical argument, or cited source). |
-| **Logical Fallacies** | Identifies reasoning errors using standard fallacy types. |
-| **Questions and Underdeveloped Areas** | Flags ambiguities and gaps. |
+| **Visão Geral** | A concise thesis summary. |
+| **Material de Origem** | Link or path to the original source. |
+| **Termos e Conceitos-Chave** | Definitions anchored to first-mention timestamps. |
+| **Resumo Detalhado** | Section-by-section breakdown with timestamp ranges. |
+| **Referências Bíblicas** | Included only when the content is theological. |
+| **Notas sobre as Provas** | Categorizes each claim by its type of support (anecdotal, appeal to authority, logical argument, or cited source). |
+| **Falácias Lógicas** | Identifies reasoning errors using standard fallacy types. |
+| **Questões e Pontos Pouco Desenvolvidos** | Flags ambiguities and gaps. |
 
 This prompt is effective because it enforces objectivity because Claude is explicitly told to analyze
 based solely on the transcript content without injecting prior knowledge about the speaker or

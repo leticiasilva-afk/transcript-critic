@@ -1,77 +1,82 @@
-# Transcript Summary Prompt Template
+# Modelo de Prompt para Resumo de Transcrições
 
-Summarize this transcript entitled: [TITLE]
+Resume esta transcrição intitulada: [TITLE]
 
-- Analyze this transcript based solely on its content. Do not incorporate prior knowledge about the channel, speaker, or their typical positions.
-- If domain-specific terminology requires explanation, define it based on context within the transcript.
+IDIOMA:
+- Escreve toda a análise em português europeu (Portugal), independentemente do idioma da transcrição. Usa a ortografia e o vocabulário de Portugal (por exemplo, "ficheiro", "ecrã", "utilizador"), não do Brasil.
+- Mantém em itálico, na língua original, citações curtas ou termos que percam significado quando traduzidos, acrescentando a tradução entre parênteses quando for útil.
+- Os títulos das secções devem ser exatamente os indicados abaixo, em português.
 
-CONTENT INGESTION REQUIREMENTS:
-- Before writing any summary, read the ENTIRE transcript using the `Read` tool.
-- If the transcript is large, use the `offset` and `limit` parameters of the `Read` tool to fetch remaining content in chunks.
-- Continue fetching until you have read every line. Do not begin summarizing until the full text has been ingested.
+- Analisa esta transcrição baseando-te apenas no seu conteúdo. Não incorpores conhecimento prévio sobre o canal, o orador ou as posições que costuma defender.
+- Se a terminologia de uma área específica precisar de explicação, define-a com base no contexto da própria transcrição.
 
-TRANSCRIPT FORMAT:
-- The transcript is provided in WebVTT (.vtt) format, which includes timestamps for each segment.
-- Use these timestamps to anchor your analysis to specific moments in the video.
-- When citing timestamps, use `[HH:MM:SS]` format (second resolution, no sub-seconds). For ranges, use `[HH:MM:SS--HH:MM:SS]` with double hyphens (`--`) as the separator, not an en-dash.
-- When a concept, claim, or fallacy spans multiple consecutive segments, cite the full range covering the relevant passage.
-- In markdown headings (`#`, `##`, `###`), timestamps appear without backticks. In all other text (bullet points, prose), wrap each timestamp in backticks for readability.
+REQUISITOS DE LEITURA DO CONTEÚDO:
+- Antes de escreveres qualquer resumo, lê a transcrição INTEIRA com a ferramenta `Read`.
+- Se a transcrição for grande, usa os parâmetros `offset` e `limit` da ferramenta `Read` para obter o resto do conteúdo por partes.
+- Continua até teres lido todas as linhas. Não comeces a resumir antes de teres lido o texto completo.
 
-**OUTPUT FORMAT:**
-Maintain neutral, descriptive tone; do not endorse or criticize the speaker's views.
-Provide a structured summary with the following sections:
+FORMATO DA TRANSCRIÇÃO:
+- A transcrição está no formato WebVTT (.vtt), que inclui timestamps para cada segmento.
+- Usa estes timestamps para ancorar a análise em momentos específicos do vídeo.
+- Ao citar timestamps, usa o formato `[HH:MM:SS]` (resolução ao segundo, sem frações). Para intervalos, usa `[HH:MM:SS--HH:MM:SS]`, com dois hífenes (`--`) como separador e não um travessão.
+- Quando um conceito, afirmação ou falácia se estende por vários segmentos consecutivos, cita o intervalo completo da passagem relevante.
+- Nos títulos markdown (`#`, `##`, `###`), os timestamps aparecem sem acentos graves. Em todo o restante texto (listas, prosa), envolve cada timestamp em acentos graves para facilitar a leitura.
 
-## Overview
-A 3-5 sentence high-level summary of the video's thesis and scope.
+**FORMATO DE SAÍDA:**
+Mantém um tom neutro e descritivo; não apoies nem critiques as opiniões do orador.
+Apresenta um resumo estruturado com as seguintes secções:
 
-## Source Material
-- **Source:** [SOURCE]
+## Visão Geral
+Um resumo de alto nível, com 3 a 5 frases, da tese e do âmbito do vídeo.
 
-Formatting rules for this section:
-- If the source is a URL, render it as a markdown link: `[URL](URL)` (the link text and href are identical).
-- If the source is a local file path, render it as inline code: `` `filename` ``.
-- Always use exactly one bullet point with the bold label **Source:** followed by the value.
-- Do not add any additional commentary, description, or metadata to this section.
+## Material de Origem
+- **Fonte:** [SOURCE]
 
-## Key Terms and Concepts
-A list of important terms, concepts, or frameworks introduced by the speaker, each with a definition or explanation based on what the speaker said or what can be directly inferred from context. Include the timestamp of the first mention. Use the format:
-- **Term** `[HH:MM:SS]`: Definition
+Regras de formatação desta secção:
+- Se a fonte for um URL, apresenta-o como ligação markdown: `[URL](URL)` (o texto da ligação e o endereço são iguais).
+- Se a fonte for um caminho de ficheiro local, apresenta-o como código inline: `` `ficheiro` ``.
+- Usa sempre exatamente um ponto de lista com a etiqueta em negrito **Fonte:** seguida do valor.
+- Não acrescentes comentários, descrições ou metadados a esta secção.
 
-## Detailed Summary
-A comprehensive section-by-section summary of the content, using subheadings to organize major topics or shifts in the discussion. Include a timestamp range for each subheading indicating the span of that section. Aim for thoroughness over brevity. Use the format:
-### Section Title [HH:MM:SS--HH:MM:SS]
+## Termos e Conceitos-Chave
+Uma lista dos termos, conceitos ou quadros de referência importantes introduzidos pelo orador, cada um com uma definição ou explicação baseada no que o orador disse ou no que se pode inferir diretamente do contexto. Inclui o timestamp da primeira menção. Usa o formato:
+- **Termo** `[HH:MM:SS]`: Definição
 
-## Scripture References
-(Include this section only if the content is theological)
-List any Bible verses or passages mentioned, with brief context on how the speaker used them. Include all timestamps where each verse is referenced (not just the first mention), as speakers often introduce a verse in one context and revisit it later. Use the format:
-- **Verse** `[HH:MM:SS]`, `[HH:MM:SS]`, ...: Context of how the speaker used it.
+## Resumo Detalhado
+Um resumo completo, secção a secção, do conteúdo, com subtítulos para organizar os temas principais ou as mudanças na discussão. Inclui um intervalo de timestamps em cada subtítulo, indicando a duração dessa secção. Privilegia a exaustividade em vez da brevidade. Usa o formato:
+### Título da Secção [HH:MM:SS--HH:MM:SS]
 
-## Evidentiary Notes
-Flag notable claims and categorize the type of support the speaker provides. Include a timestamp or timestamp range indicating where the claim and its supporting evidence appear. A claim and its evidence may span multiple segments; cite the full range. Use the format:
-- **Category** `[HH:MM:SS--HH:MM:SS]`: Description of the claim and evidence.
+## Referências Bíblicas
+(Inclui esta secção apenas se o conteúdo for teológico)
+Lista todos os versículos ou passagens da Bíblia mencionados, com um breve contexto sobre a forma como o orador os usou. Inclui todos os timestamps em que cada versículo é referido (não apenas a primeira menção), porque é comum um orador introduzir um versículo num contexto e voltar a ele mais tarde. Usa o formato:
+- **Versículo** `[HH:MM:SS]`, `[HH:MM:SS]`, ...: Contexto em que o orador o usou.
 
-Categories:
-- **Anecdotal**: Personal experience or observation ("In my experience...")
-- **Appeal to authority**: References another person's opinion without a direct source ("DHH believes...")
-- **Logical argument**: Reasoned case without external data
-- **Cited source**: Specific study, article, data point, or verifiable reference
+## Notas sobre as Provas
+Assinala as afirmações relevantes e classifica o tipo de fundamentação que o orador apresenta. Inclui um timestamp ou intervalo que indique onde aparecem a afirmação e as respetivas provas. Uma afirmação e as suas provas podem estender-se por vários segmentos; cita o intervalo completo. Usa o formato:
+- **Categoria** `[HH:MM:SS--HH:MM:SS]`: Descrição da afirmação e das provas.
 
-## Logical Fallacies
-Identify any logical fallacies present in the speaker's reasoning. If none are detected, state "No significant logical fallacies detected."
-**IMPORTANT:** Only flag fallacies that significantly weaken the argument; rhetorical flourishes are not necessarily fallacies.
+Categorias:
+- **Anedótica**: Experiência ou observação pessoal ("Na minha experiência...")
+- **Apelo à autoridade**: Refere a opinião de outra pessoa sem uma fonte direta ("O DHH acha que...")
+- **Argumento lógico**: Raciocínio fundamentado sem dados externos
+- **Fonte citada**: Estudo, artigo, dado ou referência concreta e verificável
 
-For each fallacy found, include a timestamp or range covering the relevant passage (premise through conclusion). A fallacy may involve a premise stated at one point and a conclusion drawn later; cite the full span. Use the format:
-- **Fallacy type** `[HH:MM:SS--HH:MM:SS]`: Brief description of where/how it appears in the argument and why it weakens the reasoning.
+## Falácias Lógicas
+Identifica as falácias lógicas presentes no raciocínio do orador. Se não encontrares nenhuma, escreve "Não foram detetadas falácias lógicas significativas."
+**IMPORTANTE:** Assinala apenas as falácias que enfraquecem significativamente o argumento; recursos retóricos não são necessariamente falácias.
 
-Common fallacies to watch for:
-- Ad Hominem (attacking the person rather than the argument)
-- Straw Man (misrepresenting an opposing view to make it easier to attack)
-- False Dichotomy (presenting only two options when more exist)
-- Appeal to Emotion (relying on feelings rather than logic)
-- Whataboutism/Tu Quoque (deflecting criticism by pointing to others' behavior)
-- Slippery Slope (assuming one thing will inevitably lead to extreme consequences)
-- Hasty Generalization (drawing broad conclusions from limited examples)
-- False Authority (citing unqualified sources as experts)
+Para cada falácia encontrada, inclui um timestamp ou intervalo que abranja a passagem relevante (da premissa à conclusão). Uma falácia pode envolver uma premissa enunciada num momento e uma conclusão tirada mais tarde; cita o intervalo completo. Usa o formato:
+- **Tipo de falácia** `[HH:MM:SS--HH:MM:SS]`: Breve descrição de onde e como aparece no argumento e porque enfraquece o raciocínio.
 
-## Questions and Underdeveloped Areas
-List any points that seemed ambiguous, underdeveloped, or warrant further exploration. Include a timestamp or range indicating where the ambiguity or gap occurs. Explicitly state when interpretations are uncertain.
+Falácias comuns a ter em atenção:
+- Ad Hominem (atacar a pessoa em vez do argumento)
+- Espantalho (deturpar uma posição contrária para a tornar mais fácil de atacar)
+- Falso Dilema (apresentar apenas duas opções quando existem mais)
+- Apelo à Emoção (recorrer a sentimentos em vez da lógica)
+- Whataboutism/Tu Quoque (desviar a crítica apontando o comportamento de outros)
+- Bola de Neve / Declive Escorregadio (assumir que uma coisa levará inevitavelmente a consequências extremas)
+- Generalização Precipitada (tirar conclusões gerais a partir de poucos exemplos)
+- Falsa Autoridade (citar fontes sem qualificação como se fossem especialistas)
+
+## Questões e Pontos Pouco Desenvolvidos
+Lista os pontos que pareceram ambíguos, pouco desenvolvidos ou que merecem ser aprofundados. Inclui um timestamp ou intervalo que indique onde ocorre a ambiguidade ou lacuna. Indica explicitamente quando uma interpretação é incerta.
