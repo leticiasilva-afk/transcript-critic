@@ -119,7 +119,14 @@ transcribe_audio() {
     log "✅ Done: ${BASENAME}.txt and ${BASENAME}.vtt"
 
     # The only line on stdout: the absolute path of the .vtt file.
-    echo "$(cd "$(dirname "${BASENAME}.vtt")" && pwd)/$(basename "${BASENAME}.vtt")"
+    local VTT
+    VTT="$(cd "$(dirname "${BASENAME}.vtt")" && pwd)/$(basename "${BASENAME}.vtt")"
+    # On Windows (Git Bash/MSYS), print a native path (C:/Users/...) instead of
+    # /c/Users/..., so tools outside bash can open it.
+    if command -v cygpath >/dev/null 2>&1; then
+        VTT=$(cygpath -m "${VTT}")
+    fi
+    echo "${VTT}"
 }
 
 # --- MAIN ---
